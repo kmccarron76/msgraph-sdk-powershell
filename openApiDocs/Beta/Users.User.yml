@@ -12,6 +12,9 @@ paths:
         - users.user
       summary: Get entities from users
       operationId: users.user_ListUser
+      x-ms-pageable:
+        nextLinkName: '@odata.nextLink'
+        operationName: ListAll 
       parameters:
         - $ref: '#/components/parameters/top'
         - $ref: '#/components/parameters/search'
@@ -310,13 +313,7 @@ paths:
           content:
             application/json:
               schema:
-                title: Collection of user
-                type: object
-                properties:
-                  value:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/microsoft.graph.user'
+                $ref: '#/components/schemas/paged.collection'
         default:
           $ref: '#/components/responses/error'
       x-ms-docs-operation-type: operation
@@ -840,6 +837,16 @@ paths:
       x-ms-docs-operation-type: operation
 components:
   schemas:
+    paged.collection:
+      description: Paged collection of user
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/microsoft.graph.user'
+        '@odata.nextLink':
+          type: string
     microsoft.graph.user:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.directoryObject'
