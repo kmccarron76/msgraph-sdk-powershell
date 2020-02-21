@@ -51,6 +51,12 @@ directive:
     - microsoft.graph.post
     - microsoft.graph.sectionGroup
     - microsoft.graph.team
+
+  # Add top check before calling next link.
+  - from: source-file-csharp
+    where: $                        
+    transform: return $.replace(/(^\s*)(if\s*\(\s*result.OdataNextLink\s*!=\s*null\s*\))/gm, '$1if (result.OdataNextLink != null && Top == 0)\n$1');
+
   # Formart cmdlet response.
   - where:
       model-name: MicrosoftGraphUser
