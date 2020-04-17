@@ -21,7 +21,8 @@ paths:
         - name: $orderby
           in: query
           description: Order items by property values
-          style: simple
+          style: form
+          explode: false
           schema:
             uniqueItems: true
             type: array
@@ -177,7 +178,8 @@ paths:
         - name: $select
           in: query
           description: Select properties to be returned
-          style: simple
+          style: form
+          explode: false
           schema:
             uniqueItems: true
             type: array
@@ -313,7 +315,8 @@ paths:
         - name: $expand
           in: query
           description: Expand related entities
-          style: simple
+          style: form
+          explode: false
           schema:
             uniqueItems: true
             type: array
@@ -387,8 +390,13 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/microsoft.graph.user'
+                  '@odata.nextLink':
+                    type: string
         default:
           $ref: '#/components/responses/error'
+      x-ms-pageable:
+        nextLinkName: '@odata.nextLink'
+        operationName: listMore
       x-ms-docs-operation-type: operation
     post:
       tags:
@@ -429,7 +437,8 @@ paths:
         - name: $select
           in: query
           description: Select properties to be returned
-          style: simple
+          style: form
+          explode: false
           schema:
             uniqueItems: true
             type: array
@@ -565,7 +574,8 @@ paths:
         - name: $expand
           in: query
           description: Expand related entities
-          style: simple
+          style: form
+          explode: false
           schema:
             uniqueItems: true
             type: array
@@ -916,7 +926,8 @@ paths:
         - name: $select
           in: query
           description: Select properties to be returned
-          style: simple
+          style: form
+          explode: false
           schema:
             uniqueItems: true
             type: array
@@ -929,7 +940,8 @@ paths:
         - name: $expand
           in: query
           description: Expand related entities
-          style: simple
+          style: form
+          explode: false
           schema:
             uniqueItems: true
             type: array
@@ -946,7 +958,6 @@ paths:
                 $ref: '#/components/schemas/microsoft.graph.presence'
         default:
           $ref: '#/components/responses/error'
-      x-ms-docs-operation-type: operation
     patch:
       tags:
         - users.presence
@@ -1183,6 +1194,7 @@ components:
             refreshTokensValidFromDateTime:
               pattern: '^[0-9]{4,}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]([.][0-9]{1,12})?(Z|[+-][0-9][0-9]:[0-9][0-9])$'
               type: string
+              description: 'Any refresh tokens or sessions tokens (session cookies) issued before this time are invalid, and applications will get an error when using an invalid refresh or sessions token to acquire a delegated access token (to access APIs such as Microsoft Graph).  If this happens, the application will need to acquire a new refresh token by making a request to the authorize endpoint. Returned only on $select. Read-only.'
               format: date-time
               nullable: true
             showInAddressList:
@@ -1696,6 +1708,7 @@ components:
           - '@odata.type': microsoft.graph.team
         teamwork:
           '@odata.type': microsoft.graph.userTeamwork
+      x-ms-discriminator-value: '#microsoft.graph.user'
     microsoft.graph.presence:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -1712,6 +1725,7 @@ components:
         id: string (identifier)
         availability: string
         activity: string
+      x-ms-discriminator-value: '#microsoft.graph.presence'
     microsoft.graph.directoryObject:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -1724,6 +1738,8 @@ components:
               format: date-time
               nullable: true
           description: Represents an Azure Active Directory object. The directoryObject type is the base type for many other directory entity types.
+          #discriminator:
+#            propertyName: '@odata.type'
       example:
         id: string (identifier)
         deletedDateTime: string (timestamp)
@@ -2085,6 +2101,7 @@ components:
           '@odata.type': microsoft.graph.settings
         activityStatistics:
           - '@odata.type': microsoft.graph.activityStatistics
+      x-ms-discriminator-value: '#microsoft.graph.userAnalytics'
     microsoft.graph.informationProtection:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -2119,6 +2136,7 @@ components:
           - '@odata.type': microsoft.graph.dataLossPreventionPolicy
         threatAssessmentRequests:
           - '@odata.type': microsoft.graph.threatAssessmentRequest
+      x-ms-discriminator-value: '#microsoft.graph.informationProtection'
     microsoft.graph.appRoleAssignment:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -2162,6 +2180,7 @@ components:
         principalType: string
         resourceDisplayName: string
         resourceId: string
+      x-ms-discriminator-value: '#microsoft.graph.appRoleAssignment'
     microsoft.graph.licenseDetails:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -2189,6 +2208,7 @@ components:
           - '@odata.type': microsoft.graph.servicePlanInfo
         skuId: string
         skuPartNumber: string
+      x-ms-discriminator-value: '#microsoft.graph.licenseDetails'
     microsoft.graph.scopedRoleMembership:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -2207,6 +2227,7 @@ components:
         administrativeUnitId: string
         roleMemberInfo:
           '@odata.type': microsoft.graph.identity
+      x-ms-discriminator-value: '#microsoft.graph.scopedRoleMembership'
     microsoft.graph.outlookUser:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -2240,6 +2261,7 @@ components:
           - '@odata.type': microsoft.graph.outlookTaskFolder
         tasks:
           - '@odata.type': microsoft.graph.outlookTask
+      x-ms-discriminator-value: '#microsoft.graph.outlookUser'
     microsoft.graph.message:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.outlookItem'
@@ -2380,6 +2402,8 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/microsoft.graph.mention'
+          #discriminator:
+#            propertyName: '@odata.type'
       example:
         id: string (identifier)
         createdDateTime: string (timestamp)
@@ -2851,6 +2875,7 @@ components:
           '@odata.type': microsoft.graph.onenote
         team:
           '@odata.type': microsoft.graph.team
+      x-ms-discriminator-value: '#microsoft.graph.group'
     microsoft.graph.mailFolder:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -2918,6 +2943,8 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/microsoft.graph.userConfiguration'
+          #discriminator:
+#            propertyName: '@odata.type'
       example:
         id: string (identifier)
         displayName: string
@@ -2980,6 +3007,9 @@ components:
               nullable: true
             owner:
               $ref: '#/components/schemas/microsoft.graph.emailAddress'
+            calendarGroupId:
+              type: string
+              nullable: true
             allowedOnlineMeetingProviders:
               type: array
               items:
@@ -3031,6 +3061,7 @@ components:
         canEdit: true
         owner:
           '@odata.type': microsoft.graph.emailAddress
+        calendarGroupId: string
         allowedOnlineMeetingProviders:
           - '@odata.type': microsoft.graph.onlineMeetingProviderType
         defaultOnlineMeetingProvider:
@@ -3047,6 +3078,7 @@ components:
           - '@odata.type': microsoft.graph.event
         calendarView:
           - '@odata.type': microsoft.graph.event
+      x-ms-discriminator-value: '#microsoft.graph.calendar'
     microsoft.graph.calendarGroup:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -3079,12 +3111,16 @@ components:
         changeKey: string
         calendars:
           - '@odata.type': microsoft.graph.calendar
+      x-ms-discriminator-value: '#microsoft.graph.calendarGroup'
     microsoft.graph.event:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.outlookItem'
         - title: event
           type: object
           properties:
+            transactionId:
+              type: string
+              nullable: true
             originalStartTimeZone:
               type: string
               description: The start time zone that was set when the event was created. A value of tzone://Microsoft/Custom indicates that a legacy custom time zone was set in desktop Outlook.
@@ -3195,6 +3231,9 @@ components:
             allowNewTimeProposals:
               type: boolean
               nullable: true
+            isDraft:
+              type: boolean
+              nullable: true
             attachments:
               type: array
               items:
@@ -3229,6 +3268,7 @@ components:
         changeKey: string
         categories:
           - string
+        transactionId: string
         originalStartTimeZone: string
         originalEndTimeZone: string
         responseStatus:
@@ -3277,6 +3317,7 @@ components:
         onlineMeeting:
           '@odata.type': microsoft.graph.onlineMeetingInfo
         allowNewTimeProposals: true
+        isDraft: true
         attachments:
           - '@odata.type': microsoft.graph.attachment
         singleValueExtendedProperties:
@@ -3289,6 +3330,7 @@ components:
           - '@odata.type': microsoft.graph.event
         extensions:
           - '@odata.type': microsoft.graph.extension
+      x-ms-discriminator-value: '#microsoft.graph.event'
     microsoft.graph.person:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -3403,6 +3445,7 @@ components:
         mailboxType: string
         personType: string
         userPrincipalName: string
+      x-ms-discriminator-value: '#microsoft.graph.person'
     microsoft.graph.contact:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.outlookItem'
@@ -3617,6 +3660,7 @@ components:
           '@odata.type': microsoft.graph.profilePhoto
         extensions:
           - '@odata.type': microsoft.graph.extension
+      x-ms-discriminator-value: '#microsoft.graph.contact'
     microsoft.graph.contactFolder:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -3667,6 +3711,7 @@ components:
           - '@odata.type': microsoft.graph.contact
         childFolders:
           - '@odata.type': microsoft.graph.contactFolder
+      x-ms-discriminator-value: '#microsoft.graph.contactFolder'
     microsoft.graph.inferenceClassification:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -3682,6 +3727,7 @@ components:
         id: string (identifier)
         overrides:
           - '@odata.type': microsoft.graph.inferenceClassificationOverride
+      x-ms-discriminator-value: '#microsoft.graph.inferenceClassification'
     microsoft.graph.profilePhoto:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -3706,6 +3752,7 @@ components:
         id: string (identifier)
         height: integer
         width: integer
+      x-ms-discriminator-value: '#microsoft.graph.profilePhoto'
     microsoft.graph.drive:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.baseItem'
@@ -3736,6 +3783,7 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/microsoft.graph.driveItem'
+              description: The list of items the user is following. Only in OneDrive for Business.
             items:
               type: array
               items:
@@ -3791,6 +3839,7 @@ components:
           '@odata.type': microsoft.graph.driveItem
         special:
           - '@odata.type': microsoft.graph.driveItem
+      x-ms-discriminator-value: '#microsoft.graph.drive'
     microsoft.graph.site:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.baseItem'
@@ -3892,11 +3941,14 @@ components:
           - '@odata.type': microsoft.graph.site
         onenote:
           '@odata.type': microsoft.graph.onenote
+      x-ms-discriminator-value: '#microsoft.graph.site'
     microsoft.graph.extension:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
         - title: extension
           type: object
+          #discriminator:
+#            propertyName: '@odata.type'
       example:
         id: string (identifier)
     microsoft.graph.agreementAcceptance:
@@ -3941,6 +3993,7 @@ components:
         userEmail: string
         state:
           '@odata.type': microsoft.graph.agreementAcceptanceState
+      x-ms-discriminator-value: '#microsoft.graph.agreementAcceptance'
     microsoft.graph.deviceEnrollmentConfiguration:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -3983,6 +4036,8 @@ components:
                 $ref: '#/components/schemas/microsoft.graph.enrollmentConfigurationAssignment'
               description: The list of group assignments for the device configuration profile.
           description: The Base Class of Device Enrollment Configuration
+          #discriminator:
+#            propertyName: '@odata.type'
       example:
         id: string (identifier)
         displayName: string
@@ -4292,6 +4347,8 @@ components:
                 $ref: '#/components/schemas/microsoft.graph.user'
               description: The primary users associated with the managed device.
           description: Devices that are managed or pre-enrolled through Intune
+          #discriminator:
+#            propertyName: '@odata.type'
       example:
         id: string (identifier)
         userId: string
@@ -4490,6 +4547,8 @@ components:
                 $ref: '#/components/schemas/microsoft.graph.managedAppOperation'
               description: Zero or more long running operations triggered on the app registration.
           description: The ManagedAppEntity is the base entity type for all other entity types under app management workflow.
+          #discriminator:
+#            propertyName: '@odata.type'
       example:
         id: string (identifier)
         createdDateTime: string (timestamp)
@@ -4556,6 +4615,7 @@ components:
         deviceType: string
         deviceMacAddress: string
         lastCheckInDateTime: string (timestamp)
+      x-ms-discriminator-value: '#microsoft.graph.windowsInformationProtectionDeviceRegistration'
     microsoft.graph.deviceManagementTroubleshootingEvent:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -4583,6 +4643,8 @@ components:
                 $ref: '#/components/schemas/microsoft.graph.keyValuePair'
               description: A set of string key and string value pairs which provides additional information on the Troubleshooting event
           description: Event representing an general failure.
+          #discriminator:
+#            propertyName: '@odata.type'
       example:
         id: string (identifier)
         eventDateTime: string (timestamp)
@@ -4618,6 +4680,7 @@ components:
         userId: string
         mobileAppList:
           - '@odata.type': microsoft.graph.mobileAppIntentAndStateDetail
+      x-ms-discriminator-value: '#microsoft.graph.mobileAppIntentAndState'
     microsoft.graph.mobileAppTroubleshootingEvent:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.deviceManagementTroubleshootingEvent'
@@ -4663,6 +4726,7 @@ components:
           - '@odata.type': microsoft.graph.mobileAppTroubleshootingHistoryItem
         appLogCollectionRequests:
           - '@odata.type': microsoft.graph.appLogCollectionRequest
+      x-ms-discriminator-value: '#microsoft.graph.mobileAppTroubleshootingEvent'
     microsoft.graph.notification:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -4703,6 +4767,7 @@ components:
         groupName: string
         targetPolicy:
           '@odata.type': microsoft.graph.targetPolicyEndpoints
+      x-ms-discriminator-value: '#microsoft.graph.notification'
     microsoft.graph.plannerUser:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.plannerDelta'
@@ -4751,6 +4816,7 @@ components:
           - '@odata.type': microsoft.graph.plannerPlan
         all:
           - '@odata.type': microsoft.graph.plannerDelta
+      x-ms-discriminator-value: '#microsoft.graph.plannerUser'
     microsoft.graph.officeGraphInsights:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -4780,6 +4846,7 @@ components:
           - '@odata.type': microsoft.graph.sharedInsight
         used:
           - '@odata.type': microsoft.graph.usedInsight
+      x-ms-discriminator-value: '#microsoft.graph.officeGraphInsights'
     microsoft.graph.userSettings:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -4798,6 +4865,7 @@ components:
         contributionToContentDiscoveryAsOrganizationDisabled: true
         shiftPreferences:
           '@odata.type': microsoft.graph.shiftPreferences
+      x-ms-discriminator-value: '#microsoft.graph.userSettings'
     microsoft.graph.onenote:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -4848,6 +4916,7 @@ components:
           - '@odata.type': microsoft.graph.onenoteResource
         operations:
           - '@odata.type': microsoft.graph.onenoteOperation
+      x-ms-discriminator-value: '#microsoft.graph.onenote'
     microsoft.graph.profile:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -4934,6 +5003,7 @@ components:
           - '@odata.type': microsoft.graph.webAccount
         websites:
           - '@odata.type': microsoft.graph.personWebsite
+      x-ms-discriminator-value: '#microsoft.graph.profile'
     microsoft.graph.userActivity:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -5014,6 +5084,7 @@ components:
           '@odata.type': microsoft.graph.status
         historyItems:
           - '@odata.type': microsoft.graph.activityHistoryItem
+      x-ms-discriminator-value: '#microsoft.graph.userActivity'
     microsoft.graph.device:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.directoryObject'
@@ -5193,6 +5264,7 @@ components:
           - '@odata.type': microsoft.graph.extension
         commands:
           - '@odata.type': microsoft.graph.command
+      x-ms-discriminator-value: '#microsoft.graph.device'
     microsoft.graph.onlineMeeting:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -5259,6 +5331,11 @@ components:
               type: string
               description: The video teleconferencing ID. Read-only.
               nullable: true
+            externalId:
+              type: string
+              nullable: true
+            joinInformation:
+              $ref: '#/components/schemas/microsoft.graph.itemBody'
       example:
         id: string (identifier)
         creationDateTime: string (timestamp)
@@ -5282,6 +5359,10 @@ components:
         chatInfo:
           '@odata.type': microsoft.graph.chatInfo
         videoTeleconferenceId: string
+        externalId: string
+        joinInformation:
+          '@odata.type': microsoft.graph.itemBody
+      x-ms-discriminator-value: '#microsoft.graph.onlineMeeting'
     microsoft.graph.chat:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -5324,6 +5405,7 @@ components:
           - '@odata.type': microsoft.graph.chatMessage
         installedApps:
           - '@odata.type': microsoft.graph.teamsAppInstallation
+      x-ms-discriminator-value: '#microsoft.graph.chat'
     microsoft.graph.team:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -5439,6 +5521,7 @@ components:
           - '@odata.type': microsoft.graph.teamsAppInstallation
         operations:
           - '@odata.type': microsoft.graph.teamsAsyncOperation
+      x-ms-discriminator-value: '#microsoft.graph.team'
     microsoft.graph.userTeamwork:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -5453,6 +5536,7 @@ components:
         id: string (identifier)
         installedApps:
           - '@odata.type': microsoft.graph.teamsAppInstallation
+      x-ms-discriminator-value: '#microsoft.graph.userTeamwork'
     microsoft.graph.entity:
       title: entity
       type: object
@@ -5598,6 +5682,8 @@ components:
               pattern: '^-?P([0-9]+D)?(T([0-9]+H)?([0-9]+M)?([0-9]+([.][0-9]+)?S)?)?$'
               type: string
               format: duration
+          #discriminator:
+#            propertyName: '@odata.type'
       example:
         id: string (identifier)
         activity:
@@ -5620,6 +5706,7 @@ components:
         id: string (identifier)
         labels:
           - '@odata.type': microsoft.graph.informationProtectionLabel
+      x-ms-discriminator-value: '#microsoft.graph.informationProtectionPolicy'
     microsoft.graph.sensitivityLabel:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -5689,6 +5776,7 @@ components:
           '@odata.type': microsoft.graph.sensitivityLabelTarget
         sublabels:
           - '@odata.type': microsoft.graph.sensitivityLabel
+      x-ms-discriminator-value: '#microsoft.graph.sensitivityLabel'
     microsoft.graph.sensitivityPolicySettings:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -5713,6 +5801,7 @@ components:
         downgradeSensitivityRequiresJustification: true
         applicableTo:
           '@odata.type': microsoft.graph.sensitivityLabelTarget
+      x-ms-discriminator-value: '#microsoft.graph.sensitivityPolicySettings'
     microsoft.graph.dataLossPreventionPolicy:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -5725,6 +5814,7 @@ components:
       example:
         id: string (identifier)
         name: string
+      x-ms-discriminator-value: '#microsoft.graph.dataLossPreventionPolicy'
     microsoft.graph.threatAssessmentRequest:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -5734,6 +5824,7 @@ components:
             createdDateTime:
               pattern: '^[0-9]{4,}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]([.][0-9]{1,12})?(Z|[+-][0-9][0-9]:[0-9][0-9])$'
               type: string
+              description: 'The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 would look like this: ''2014-01-01T00:00:00Z''.'
               format: date-time
               nullable: true
             contentType:
@@ -5752,6 +5843,9 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/microsoft.graph.threatAssessmentResult'
+              description: 'A collection of threat assessment results. Read-only. By default, a GET /threatAssessmentRequests/{id} does not return this property unless you apply $expand on it.'
+          #discriminator:
+#            propertyName: '@odata.type'
       example:
         id: string (identifier)
         createdDateTime: string (timestamp)
@@ -5828,6 +5922,7 @@ components:
         displayName: string
         color:
           '@odata.type': microsoft.graph.categoryColor
+      x-ms-discriminator-value: '#microsoft.graph.outlookCategory'
     microsoft.graph.outlookTaskGroup:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -5860,6 +5955,7 @@ components:
         groupKey: string
         taskFolders:
           - '@odata.type': microsoft.graph.outlookTaskFolder
+      x-ms-discriminator-value: '#microsoft.graph.outlookTaskGroup'
     microsoft.graph.outlookTaskFolder:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -5904,6 +6000,7 @@ components:
           - '@odata.type': microsoft.graph.singleValueLegacyExtendedProperty
         multiValueExtendedProperties:
           - '@odata.type': microsoft.graph.multiValueLegacyExtendedProperty
+      x-ms-discriminator-value: '#microsoft.graph.outlookTaskFolder'
     microsoft.graph.outlookTask:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.outlookItem'
@@ -5995,6 +6092,7 @@ components:
           - '@odata.type': microsoft.graph.multiValueLegacyExtendedProperty
         attachments:
           - '@odata.type': microsoft.graph.attachment
+      x-ms-discriminator-value: '#microsoft.graph.outlookTask'
     microsoft.graph.outlookItem:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -6023,6 +6121,8 @@ components:
                 type: string
                 nullable: true
               description: The categories associated with the item
+          #discriminator:
+#            propertyName: '@odata.type'
       example:
         id: string (identifier)
         createdDateTime: string (timestamp)
@@ -6124,6 +6224,7 @@ components:
       example:
         id: string (identifier)
         value: string
+      x-ms-discriminator-value: '#microsoft.graph.singleValueLegacyExtendedProperty'
     microsoft.graph.multiValueLegacyExtendedProperty:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -6140,6 +6241,7 @@ components:
         id: string (identifier)
         value:
           - string
+      x-ms-discriminator-value: '#microsoft.graph.multiValueLegacyExtendedProperty'
     microsoft.graph.attachment:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -6169,6 +6271,8 @@ components:
             isInline:
               type: boolean
               description: 'true if the attachment is an inline attachment; otherwise, false.'
+          #discriminator:
+#            propertyName: '@odata.type'
       example:
         id: string (identifier)
         lastModifiedDateTime: string (timestamp)
@@ -6220,6 +6324,7 @@ components:
         serverCreatedDateTime: string (timestamp)
         deepLink: string
         application: string
+      x-ms-discriminator-value: '#microsoft.graph.mention'
     microsoft.graph.assignedLabel:
       title: assignedLabel
       type: object
@@ -6272,6 +6377,7 @@ components:
         templateId: string
         values:
           - '@odata.type': microsoft.graph.settingValue
+      x-ms-discriminator-value: '#microsoft.graph.directorySetting'
     microsoft.graph.endpoint:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.directoryObject'
@@ -6300,6 +6406,7 @@ components:
         providerName: string
         uri: string
         providerResourceId: string
+      x-ms-discriminator-value: '#microsoft.graph.endpoint'
     microsoft.graph.resourceSpecificPermissionGrant:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.directoryObject'
@@ -6330,6 +6437,7 @@ components:
         resourceAppId: string
         permissionType: string
         permission: string
+      x-ms-discriminator-value: '#microsoft.graph.resourceSpecificPermissionGrant'
     microsoft.graph.conversation:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -6370,6 +6478,7 @@ components:
         preview: string
         threads:
           - '@odata.type': microsoft.graph.conversationThread
+      x-ms-discriminator-value: '#microsoft.graph.conversation'
     microsoft.graph.conversationThread:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -6428,6 +6537,7 @@ components:
         isLocked: true
         posts:
           - '@odata.type': microsoft.graph.post
+      x-ms-discriminator-value: '#microsoft.graph.conversationThread'
     microsoft.graph.groupLifecyclePolicy:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -6454,6 +6564,7 @@ components:
         groupLifetimeInDays: integer
         managedGroupTypes: string
         alternateNotificationEmails: string
+      x-ms-discriminator-value: '#microsoft.graph.groupLifecyclePolicy'
     microsoft.graph.plannerGroup:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -6469,6 +6580,7 @@ components:
         id: string (identifier)
         plans:
           - '@odata.type': microsoft.graph.plannerPlan
+      x-ms-discriminator-value: '#microsoft.graph.plannerGroup'
     microsoft.graph.messageRule:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -6517,6 +6629,7 @@ components:
         isEnabled: true
         hasError: true
         isReadOnly: true
+      x-ms-discriminator-value: '#microsoft.graph.messageRule'
     microsoft.graph.userConfiguration:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -6530,6 +6643,7 @@ components:
       example:
         id: string (identifier)
         binaryData: string
+      x-ms-discriminator-value: '#microsoft.graph.userConfiguration'
     microsoft.graph.calendarColor:
       title: calendarColor
       enum:
@@ -6598,6 +6712,7 @@ components:
           '@odata.type': microsoft.graph.calendarRoleType
         allowedRoles:
           - '@odata.type': microsoft.graph.calendarRoleType
+      x-ms-discriminator-value: '#microsoft.graph.calendarPermission'
     microsoft.graph.responseStatus:
       title: responseStatus
       type: object
@@ -6727,6 +6842,7 @@ components:
           '@odata.type': microsoft.graph.responseStatus
         proposedNewTime:
           '@odata.type': microsoft.graph.timeSlot
+      x-ms-discriminator-value: '#microsoft.graph.attendee'
     microsoft.graph.onlineMeetingInfo:
       title: onlineMeetingInfo
       type: object
@@ -6834,6 +6950,7 @@ components:
         type:
           '@odata.type': microsoft.graph.emailType
         otherLabel: string
+      x-ms-discriminator-value: '#microsoft.graph.typedEmailAddress'
     microsoft.graph.physicalAddress:
       title: physicalAddress
       type: object
@@ -6888,6 +7005,7 @@ components:
           '@odata.type': microsoft.graph.inferenceClassificationType
         senderEmailAddress:
           '@odata.type': microsoft.graph.emailAddress
+      x-ms-discriminator-value: '#microsoft.graph.inferenceClassificationOverride'
     microsoft.graph.baseItem:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -6930,6 +7048,8 @@ components:
               $ref: '#/components/schemas/microsoft.graph.user'
             lastModifiedByUser:
               $ref: '#/components/schemas/microsoft.graph.user'
+          # discriminator:
+          #   propertyName: '@odata.type'
       example:
         id: string (identifier)
         createdBy:
@@ -7073,6 +7193,7 @@ components:
           '@odata.type': microsoft.graph.driveItem
         listItem:
           '@odata.type': microsoft.graph.listItem
+      x-ms-discriminator-value: '#microsoft.graph.itemActivityOLD'
     microsoft.graph.driveItem:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.baseItem'
@@ -7249,6 +7370,7 @@ components:
           - '@odata.type': microsoft.graph.thumbnailSet
         versions:
           - '@odata.type': microsoft.graph.driveItemVersion
+      x-ms-discriminator-value: '#microsoft.graph.driveItem'
     microsoft.graph.list:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.baseItem'
@@ -7290,6 +7412,7 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/microsoft.graph.subscription'
+              description: The set of subscriptions on the list.
       example:
         id: string (identifier)
         createdBy:
@@ -7327,6 +7450,7 @@ components:
           - '@odata.type': microsoft.graph.listItem
         subscriptions:
           - '@odata.type': microsoft.graph.subscription
+      x-ms-discriminator-value: '#microsoft.graph.list'
     microsoft.graph.root:
       title: root
       type: object
@@ -7370,6 +7494,7 @@ components:
           '@odata.type': microsoft.graph.itemActivityStat
         lastSevenDays:
           '@odata.type': microsoft.graph.itemActivityStat
+      x-ms-discriminator-value: '#microsoft.graph.itemAnalytics'
     microsoft.graph.columnDefinition:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -7467,6 +7592,7 @@ components:
         required: true
         text:
           '@odata.type': microsoft.graph.textColumn
+      x-ms-discriminator-value: '#microsoft.graph.columnDefinition'
     microsoft.graph.contentType:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -7525,6 +7651,7 @@ components:
         sealed: true
         columnLinks:
           - '@odata.type': microsoft.graph.columnLink
+      x-ms-discriminator-value: '#microsoft.graph.contentType'
     microsoft.graph.sitePage:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.baseItem'
@@ -7571,6 +7698,7 @@ components:
           - '@odata.type': microsoft.graph.webPart
         publishingState:
           '@odata.type': microsoft.graph.publicationFacet
+      x-ms-discriminator-value: '#microsoft.graph.sitePage'
     microsoft.graph.agreementAcceptanceState:
       title: agreementAcceptanceState
       enum:
@@ -7599,6 +7727,7 @@ components:
         source:
           '@odata.type': microsoft.graph.deviceAndAppManagementAssignmentSource
         sourceId: string
+      x-ms-discriminator-value: '#microsoft.graph.enrollmentConfigurationAssignment'
     microsoft.graph.hardwareInformation:
       title: hardwareInformation
       type: object
@@ -8150,7 +8279,7 @@ components:
         lastSyncDateTime:
           pattern: '^[0-9]{4,}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]([.][0-9]{1,12})?(Z|[+-][0-9][0-9]:[0-9][0-9])$'
           type: string
-          description: Datetime fo last sync with configuration manager management point.
+          description: Datetime for last sync with configuration manager management point.
           format: date-time
       example:
         state:
@@ -8165,8 +8294,12 @@ components:
           type: string
           description: Configuration Manager Client Id from SCCM
           nullable: true
+        isBlocked:
+          type: boolean
+          description: Configuration Manager Client blocked status from SCCM
       example:
         clientIdentifier: string
+        isBlocked: true
     microsoft.graph.managedDeviceArchitecture:
       title: managedDeviceArchitecture
       enum:
@@ -8201,6 +8334,7 @@ components:
         displayName: string
         settingStates:
           - '@odata.type': microsoft.graph.securityBaselineSettingState
+      x-ms-discriminator-value: '#microsoft.graph.securityBaselineState'
     microsoft.graph.deviceConfigurationState:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -8253,6 +8387,7 @@ components:
         settingCount: integer
         userId: string
         userPrincipalName: string
+      x-ms-discriminator-value: '#microsoft.graph.deviceConfigurationState'
     microsoft.graph.deviceCompliancePolicyState:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -8305,6 +8440,7 @@ components:
         settingCount: integer
         userId: string
         userPrincipalName: string
+      x-ms-discriminator-value: '#microsoft.graph.deviceCompliancePolicyState'
     microsoft.graph.managedDeviceMobileAppConfigurationState:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -8357,6 +8493,7 @@ components:
         settingCount: integer
         userId: string
         userPrincipalName: string
+      x-ms-discriminator-value: '#microsoft.graph.managedDeviceMobileAppConfigurationState'
     microsoft.graph.detectedApp:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -8395,6 +8532,7 @@ components:
         deviceCount: integer
         managedDevices:
           - '@odata.type': microsoft.graph.managedDevice
+      x-ms-discriminator-value: '#microsoft.graph.detectedApp'
     microsoft.graph.deviceCategory:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -8422,6 +8560,7 @@ components:
         description: string
         roleScopeTagIds:
           - string
+      x-ms-discriminator-value: '#microsoft.graph.deviceCategory'
     microsoft.graph.windowsProtectionState:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -8528,6 +8667,7 @@ components:
         lastReportedDateTime: string (timestamp)
         detectedMalwareState:
           - '@odata.type': microsoft.graph.windowsDeviceMalwareState
+      x-ms-discriminator-value: '#microsoft.graph.windowsProtectionState'
     microsoft.graph.managedAppFlaggedReason:
       title: managedAppFlaggedReason
       enum:
@@ -8573,6 +8713,8 @@ components:
               description: Version of the entity.
               nullable: true
           description: The ManagedAppPolicy resource represents a base type for platform specific policies.
+          #discriminator:
+#            propertyName: '@odata.type'
       example:
         id: string (identifier)
         displayName: string
@@ -8612,6 +8754,7 @@ components:
         lastModifiedDateTime: string (timestamp)
         state: string
         version: string
+      x-ms-discriminator-value: '#microsoft.graph.managedAppOperation'
     microsoft.graph.deviceManagementTroubleshootingErrorDetails:
       title: deviceManagementTroubleshootingErrorDetails
       type: object
@@ -8739,6 +8882,7 @@ components:
         customLogFolders:
           - string
         completedDateTime: string (timestamp)
+      x-ms-discriminator-value: '#microsoft.graph.appLogCollectionRequest'
     microsoft.graph.payloadTypes:
       title: payloadTypes
       type: object
@@ -8776,6 +8920,8 @@ components:
         - $ref: '#/components/schemas/microsoft.graph.entity'
         - title: plannerDelta
           type: object
+          #discriminator:
+#            propertyName: '@odata.type'
       example:
         id: string (identifier)
     microsoft.graph.plannerFavoritePlanReferenceCollection:
@@ -8929,6 +9075,7 @@ components:
           '@odata.type': microsoft.graph.plannerProgressTaskBoardTaskFormat
         bucketTaskBoardFormat:
           '@odata.type': microsoft.graph.plannerBucketTaskBoardTaskFormat
+      x-ms-discriminator-value: '#microsoft.graph.plannerTask'
     microsoft.graph.plannerPlan:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.plannerDelta'
@@ -8979,6 +9126,7 @@ components:
           - '@odata.type': microsoft.graph.plannerBucket
         details:
           '@odata.type': microsoft.graph.plannerPlanDetails
+      x-ms-discriminator-value: '#microsoft.graph.plannerPlan'
     microsoft.graph.trending:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -9010,6 +9158,7 @@ components:
         lastModifiedDateTime: string (timestamp)
         resource:
           '@odata.type': microsoft.graph.entity
+      x-ms-discriminator-value: '#microsoft.graph.trending'
     microsoft.graph.sharedInsight:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -9044,6 +9193,7 @@ components:
           '@odata.type': microsoft.graph.entity
         resource:
           '@odata.type': microsoft.graph.entity
+      x-ms-discriminator-value: '#microsoft.graph.sharedInsight'
     microsoft.graph.usedInsight:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -9068,6 +9218,7 @@ components:
           '@odata.type': microsoft.graph.resourceReference
         resource:
           '@odata.type': microsoft.graph.entity
+      x-ms-discriminator-value: '#microsoft.graph.usedInsight'
     microsoft.graph.shiftPreferences:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.changeTrackedEntity'
@@ -9086,6 +9237,7 @@ components:
           '@odata.type': microsoft.graph.identitySet
         availability:
           - '@odata.type': microsoft.graph.shiftAvailability
+      x-ms-discriminator-value: '#microsoft.graph.shiftPreferences'
     microsoft.graph.notebook:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.onenoteEntityHierarchyModel'
@@ -9144,6 +9296,7 @@ components:
           - '@odata.type': microsoft.graph.onenoteSection
         sectionGroups:
           - '@odata.type': microsoft.graph.sectionGroup
+      x-ms-discriminator-value: '#microsoft.graph.notebook'
     microsoft.graph.onenoteSection:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.onenoteEntityHierarchyModel'
@@ -9189,6 +9342,7 @@ components:
           '@odata.type': microsoft.graph.sectionGroup
         pages:
           - '@odata.type': microsoft.graph.onenotePage
+      x-ms-discriminator-value: '#microsoft.graph.onenoteSection'
     microsoft.graph.sectionGroup:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.onenoteEntityHierarchyModel'
@@ -9237,6 +9391,7 @@ components:
           - '@odata.type': microsoft.graph.onenoteSection
         sectionGroups:
           - '@odata.type': microsoft.graph.sectionGroup
+      x-ms-discriminator-value: '#microsoft.graph.sectionGroup'
     microsoft.graph.onenotePage:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.onenoteEntitySchemaObjectModel'
@@ -9310,6 +9465,7 @@ components:
           '@odata.type': microsoft.graph.onenoteSection
         parentNotebook:
           '@odata.type': microsoft.graph.notebook
+      x-ms-discriminator-value: '#microsoft.graph.onenotePage'
     microsoft.graph.onenoteResource:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.onenoteEntityBaseModel'
@@ -9330,6 +9486,7 @@ components:
         self: string
         content: string
         contentUrl: string
+      x-ms-discriminator-value: '#microsoft.graph.onenoteResource'
     microsoft.graph.onenoteOperation:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.operation'
@@ -9361,6 +9518,7 @@ components:
         error:
           '@odata.type': microsoft.graph.onenoteOperationError
         percentComplete: string
+      x-ms-discriminator-value: '#microsoft.graph.onenoteOperation'
     microsoft.graph.userAccountInformation:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.itemFacet'
@@ -9392,6 +9550,7 @@ components:
         preferredLanguageTag:
           '@odata.type': microsoft.graph.localeInfo
         userPrincipalName: string
+      x-ms-discriminator-value: '#microsoft.graph.userAccountInformation'
     microsoft.graph.personAnniversary:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.itemFacet'
@@ -9420,6 +9579,7 @@ components:
         type:
           '@odata.type': microsoft.graph.anniversaryType
         date: string (timestamp)
+      x-ms-discriminator-value: '#microsoft.graph.personAnniversary'
     microsoft.graph.educationalActivity:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.itemFacet'
@@ -9464,6 +9624,7 @@ components:
         program:
           '@odata.type': microsoft.graph.educationalActivityDetail
         startMonthYear: string (timestamp)
+      x-ms-discriminator-value: '#microsoft.graph.educationalActivity'
     microsoft.graph.itemEmail:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.itemFacet'
@@ -9493,6 +9654,7 @@ components:
         displayName: string
         type:
           '@odata.type': microsoft.graph.emailType
+      x-ms-discriminator-value: '#microsoft.graph.itemEmail'
     microsoft.graph.personInterest:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.itemFacet'
@@ -9529,6 +9691,7 @@ components:
         description: string
         displayName: string
         webUrl: string
+      x-ms-discriminator-value: '#microsoft.graph.personInterest'
     microsoft.graph.languageProficiency:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.itemFacet'
@@ -9557,6 +9720,7 @@ components:
         tag: string
         proficiency:
           '@odata.type': microsoft.graph.languageProficiencyLevel
+      x-ms-discriminator-value: '#microsoft.graph.languageProficiency'
     microsoft.graph.personName:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.itemFacet'
@@ -9616,6 +9780,7 @@ components:
         title: string
         pronunciation:
           '@odata.type': microsoft.graph.yomiPersonName
+      x-ms-discriminator-value: '#microsoft.graph.personName'
     microsoft.graph.itemPhone:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.itemFacet'
@@ -9645,6 +9810,7 @@ components:
         type:
           '@odata.type': microsoft.graph.phoneType
         number: string
+      x-ms-discriminator-value: '#microsoft.graph.itemPhone'
     microsoft.graph.workPosition:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.itemFacet'
@@ -9674,6 +9840,7 @@ components:
           - string
         detail:
           '@odata.type': microsoft.graph.positionDetail
+      x-ms-discriminator-value: '#microsoft.graph.workPosition'
     microsoft.graph.projectParticipation:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.itemFacet'
@@ -9722,6 +9889,7 @@ components:
           - '@odata.type': microsoft.graph.relatedPerson
         sponsors:
           - '@odata.type': microsoft.graph.relatedPerson
+      x-ms-discriminator-value: '#microsoft.graph.projectParticipation'
     microsoft.graph.skillProficiency:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.itemFacet'
@@ -9758,6 +9926,7 @@ components:
         proficiency:
           '@odata.type': microsoft.graph.skillProficiencyLevel
         webUrl: string
+      x-ms-discriminator-value: '#microsoft.graph.skillProficiency'
     microsoft.graph.webAccount:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.itemFacet'
@@ -9795,6 +9964,7 @@ components:
           '@odata.type': microsoft.graph.serviceInformation
         statusMessage: string
         webUrl: string
+      x-ms-discriminator-value: '#microsoft.graph.webAccount'
     microsoft.graph.personWebsite:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.itemFacet'
@@ -9830,6 +10000,7 @@ components:
         description: string
         displayName: string
         webUrl: string
+      x-ms-discriminator-value: '#microsoft.graph.personWebsite'
     microsoft.graph.visualInfo:
       title: visualInfo
       type: object
@@ -9932,6 +10103,7 @@ components:
         userTimezone: string
         activity:
           '@odata.type': microsoft.graph.userActivity
+      x-ms-discriminator-value: '#microsoft.graph.activityHistoryItem'
     microsoft.graph.alternativeSecurityId:
       title: alternativeSecurityId
       type: object
@@ -10000,6 +10172,7 @@ components:
         PostBackUri: string
         responsepayload:
           '@odata.type': microsoft.graph.payloadResponse
+      x-ms-discriminator-value: '#microsoft.graph.command'
     microsoft.graph.meetingParticipants:
       title: meetingParticipants
       type: object
@@ -10100,6 +10273,8 @@ components:
             displayName:
               type: string
               nullable: true
+          #discriminator:
+#            propertyName: '@odata.type'
       example:
         id: string (identifier)
         roles:
@@ -10204,6 +10379,7 @@ components:
           - '@odata.type': microsoft.graph.chatMessage
         hostedContents:
           - '@odata.type': microsoft.graph.chatMessageHostedContent
+      x-ms-discriminator-value: '#microsoft.graph.chatMessage'
     microsoft.graph.teamsAppInstallation:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -10220,6 +10396,7 @@ components:
           '@odata.type': microsoft.graph.teamsApp
         teamsAppDefinition:
           '@odata.type': microsoft.graph.teamsAppDefinition
+      x-ms-discriminator-value: '#microsoft.graph.teamsAppInstallation'
     microsoft.graph.teamSpecialization:
       title: teamSpecialization
       enum:
@@ -10458,6 +10635,7 @@ components:
           - '@odata.type': microsoft.graph.offerShiftRequest
         timeOffRequests:
           - '@odata.type': microsoft.graph.timeOffRequest
+      x-ms-discriminator-value: '#microsoft.graph.schedule'
     microsoft.graph.teamsTemplate:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -10465,6 +10643,7 @@ components:
           type: object
       example:
         id: string (identifier)
+      x-ms-discriminator-value: '#microsoft.graph.teamsTemplate'
     microsoft.graph.channel:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -10523,6 +10702,7 @@ components:
           - '@odata.type': microsoft.graph.conversationMember
         filesFolder:
           '@odata.type': microsoft.graph.driveItem
+      x-ms-discriminator-value: '#microsoft.graph.channel'
     microsoft.graph.teamsCatalogApp:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -10543,6 +10723,7 @@ components:
         name: string
         distributionMethod:
           '@odata.type': microsoft.graph.teamsAppDistributionMethod
+      x-ms-discriminator-value: '#microsoft.graph.teamsCatalogApp'
     microsoft.graph.teamsAsyncOperation:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -10587,6 +10768,7 @@ components:
         targetResourceLocation: string
         error:
           '@odata.type': microsoft.graph.operationError
+      x-ms-discriminator-value: '#microsoft.graph.teamsAsyncOperation'
     odata.error.main:
       required:
         - code
@@ -10683,6 +10865,7 @@ components:
         sensitivity: integer
         tooltip: string
         isActive: true
+      x-ms-discriminator-value: '#microsoft.graph.informationProtectionLabel'
     microsoft.graph.applicationMode:
       title: applicationMode
       enum:
@@ -10779,12 +10962,14 @@ components:
             createdDateTime:
               pattern: '^[0-9]{4,}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]([.][0-9]{1,12})?(Z|[+-][0-9][0-9]:[0-9][0-9])$'
               type: string
+              description: 'The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 would look like this: ''2014-01-01T00:00:00Z''.'
               format: date-time
               nullable: true
             resultType:
               $ref: '#/components/schemas/microsoft.graph.threatAssessmentResultType'
             message:
               type: string
+              description: The result message for each threat assessment.
               nullable: true
       example:
         id: string (identifier)
@@ -10792,6 +10977,7 @@ components:
         resultType:
           '@odata.type': microsoft.graph.threatAssessmentResultType
         message: string
+      x-ms-discriminator-value: '#microsoft.graph.threatAssessmentResult'
     microsoft.graph.categoryColor:
       title: categoryColor
       enum:
@@ -10953,6 +11139,7 @@ components:
           - '@odata.type': microsoft.graph.attachment
         mentions:
           - '@odata.type': microsoft.graph.mention
+      x-ms-discriminator-value: '#microsoft.graph.post'
     microsoft.graph.messageRulePredicates:
       title: messageRulePredicates
       type: object
@@ -11370,6 +11557,7 @@ components:
           '@odata.type': microsoft.graph.emailAddress
         type:
           '@odata.type': microsoft.graph.attendeeType
+      x-ms-discriminator-value: '#microsoft.graph.attendeeBase'
     microsoft.graph.timeSlot:
       title: timeSlot
       type: object
@@ -11603,6 +11791,7 @@ components:
           '@odata.type': microsoft.graph.fieldValueSet
         versions:
           - '@odata.type': microsoft.graph.listItemVersion
+      x-ms-discriminator-value: '#microsoft.graph.listItem'
     microsoft.graph.audio:
       title: audio
       type: object
@@ -11953,6 +12142,8 @@ components:
           type: string
           description: Unique identifier for the remote item in its drive. Read-only.
           nullable: true
+        image:
+          $ref: '#/components/schemas/microsoft.graph.image'
         lastModifiedBy:
           $ref: '#/components/schemas/microsoft.graph.identitySet'
         lastModifiedDateTime:
@@ -11980,6 +12171,8 @@ components:
           nullable: true
         specialFolder:
           $ref: '#/components/schemas/microsoft.graph.specialFolder'
+        video:
+          $ref: '#/components/schemas/microsoft.graph.video'
         webDavUrl:
           type: string
           description: DAV compatible URL for the item.
@@ -11999,6 +12192,8 @@ components:
         folder:
           '@odata.type': microsoft.graph.folder
         id: string
+        image:
+          '@odata.type': microsoft.graph.image
         lastModifiedBy:
           '@odata.type': microsoft.graph.identitySet
         lastModifiedDateTime: string (timestamp)
@@ -12014,6 +12209,8 @@ components:
         size: integer
         specialFolder:
           '@odata.type': microsoft.graph.specialFolder
+        video:
+          '@odata.type': microsoft.graph.video
         webDavUrl: string
         webUrl: string
     microsoft.graph.searchResult:
@@ -12179,6 +12376,7 @@ components:
           - '@odata.type': microsoft.graph.workbookComment
         functions:
           '@odata.type': microsoft.graph.workbookFunctions
+      x-ms-discriminator-value: '#microsoft.graph.workbook'
     microsoft.graph.permission:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -12232,6 +12430,7 @@ components:
         roles:
           - string
         shareId: string
+      x-ms-discriminator-value: '#microsoft.graph.permission'
     microsoft.graph.subscription:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -12243,7 +12442,7 @@ components:
               description: Required. Specifies the resource that will be monitored for changes. Do not include the base URL (https://graph.microsoft.com/v1.0/). See the possible resource path values for each supported resource.
             changeType:
               type: string
-              description: 'Required. Indicates the type of change in the subscribed resource that will raise a notification. The supported values are: created, updated, deleted. Multiple values can be combined using a comma-separated list.Note: Drive root item notifications support only the updated changeType. User and group notifications support updated and deleted changeType.'
+              description: 'Required. Indicates the type of change in the subscribed resource that will raise a notification. The supported values are: created, updated, deleted. Multiple values can be combined using a comma-separated list.Note: Drive root item and list notifications support only the updated changeType. User and group notifications support updated and deleted changeType.'
             clientState:
               type: string
               description: Optional. Specifies the value of the clientState property sent by the service in each notification. The maximum length is 128 characters. The client can check that the notification came from the service by comparing the value of the clientState property sent with the subscription with the value of the clientState property received with each notification.
@@ -12298,6 +12497,7 @@ components:
         encryptionCertificate: string
         encryptionCertificateId: string
         latestSupportedTlsVersion: string
+      x-ms-discriminator-value: '#microsoft.graph.subscription'
     microsoft.graph.thumbnailSet:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -12322,6 +12522,7 @@ components:
           '@odata.type': microsoft.graph.thumbnail
         source:
           '@odata.type': microsoft.graph.thumbnail
+      x-ms-discriminator-value: '#microsoft.graph.thumbnailSet'
     microsoft.graph.driveItemVersion:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.baseItemVersion'
@@ -12347,6 +12548,7 @@ components:
           '@odata.type': microsoft.graph.publicationFacet
         content: string
         size: integer
+      x-ms-discriminator-value: '#microsoft.graph.driveItemVersion'
     microsoft.graph.listInfo:
       title: listInfo
       type: object
@@ -12425,6 +12627,7 @@ components:
           '@odata.type': microsoft.graph.incompleteData
         activities:
           - '@odata.type': microsoft.graph.itemActivity
+      x-ms-discriminator-value: '#microsoft.graph.itemActivityStat'
     microsoft.graph.booleanColumn:
       title: booleanColumn
       type: object
@@ -12658,6 +12861,7 @@ components:
       example:
         id: string (identifier)
         name: string
+      x-ms-discriminator-value: '#microsoft.graph.columnLink'
     microsoft.graph.contentTypeInfo:
       title: contentTypeInfo
       type: object
@@ -12791,6 +12995,7 @@ components:
         state:
           '@odata.type': microsoft.graph.securityBaselineComplianceState
         settingCategoryId: string
+      x-ms-discriminator-value: '#microsoft.graph.securityBaselineSettingState'
     microsoft.graph.deviceConfigurationSettingState:
       title: deviceConfigurationSettingState
       type: object
@@ -13089,6 +13294,7 @@ components:
         detectionCount: integer
         category:
           '@odata.type': microsoft.graph.windowsMalwareCategory
+      x-ms-discriminator-value: '#microsoft.graph.windowsDeviceMalwareState'
     microsoft.graph.deviceManagementTroubleshootingErrorResource:
       title: deviceManagementTroubleshootingErrorResource
       type: object
@@ -13204,6 +13410,7 @@ components:
           '@odata.type': microsoft.graph.plannerExternalReferences
         checklist:
           '@odata.type': microsoft.graph.plannerChecklistItems
+      x-ms-discriminator-value: '#microsoft.graph.plannerTaskDetails'
     microsoft.graph.plannerAssignedToTaskBoardTaskFormat:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.plannerDelta'
@@ -13221,6 +13428,7 @@ components:
         unassignedOrderHint: string
         orderHintsByAssignee:
           '@odata.type': microsoft.graph.plannerOrderHintsByAssignee
+      x-ms-discriminator-value: '#microsoft.graph.plannerAssignedToTaskBoardTaskFormat'
     microsoft.graph.plannerProgressTaskBoardTaskFormat:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.plannerDelta'
@@ -13234,6 +13442,7 @@ components:
       example:
         id: string (identifier)
         orderHint: string
+      x-ms-discriminator-value: '#microsoft.graph.plannerProgressTaskBoardTaskFormat'
     microsoft.graph.plannerBucketTaskBoardTaskFormat:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.plannerDelta'
@@ -13247,6 +13456,7 @@ components:
       example:
         id: string (identifier)
         orderHint: string
+      x-ms-discriminator-value: '#microsoft.graph.plannerBucketTaskBoardTaskFormat'
     microsoft.graph.plannerPlanContextCollection:
       title: plannerPlanContextCollection
       type: object
@@ -13279,6 +13489,7 @@ components:
         orderHint: string
         tasks:
           - '@odata.type': microsoft.graph.plannerTask
+      x-ms-discriminator-value: '#microsoft.graph.plannerBucket'
     microsoft.graph.plannerPlanDetails:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.plannerDelta'
@@ -13299,6 +13510,7 @@ components:
           '@odata.type': microsoft.graph.plannerCategoryDescriptions
         contextDetails:
           '@odata.type': microsoft.graph.plannerPlanContextDetailsCollection
+      x-ms-discriminator-value: '#microsoft.graph.plannerPlanDetails'
     microsoft.graph.resourceVisualization:
       title: resourceVisualization
       type: object
@@ -13431,6 +13643,8 @@ components:
               nullable: true
             lastModifiedBy:
               $ref: '#/components/schemas/microsoft.graph.identitySet'
+          #discriminator:
+#            propertyName: '@odata.type'
       example:
         id: string (identifier)
         createdDateTime: string (timestamp)
@@ -13476,6 +13690,8 @@ components:
               description: 'The date and time when the notebook was last modified. The timestamp represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 would look like this: ''2014-01-01T00:00:00Z''. Read-only.'
               format: date-time
               nullable: true
+          #discriminator:
+#            propertyName: '@odata.type'
       example:
         id: string (identifier)
         self: string
@@ -13532,6 +13748,8 @@ components:
               description: 'The date and time when the page was created. The timestamp represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 would look like this: ''2014-01-01T00:00:00Z''. Read-only.'
               format: date-time
               nullable: true
+          #discriminator:
+#            propertyName: '@odata.type'
       example:
         id: string (identifier)
         self: string
@@ -13559,6 +13777,8 @@ components:
               type: string
               description: The endpoint where you can get details about the page. Read-only.
               nullable: true
+          #discriminator:
+#            propertyName: '@odata.type'
       example:
         id: string (identifier)
         self: string
@@ -13582,6 +13802,8 @@ components:
               description: The time of the last action of the operation.
               format: date-time
               nullable: true
+          #discriminator:
+#            propertyName: '@odata.type'
       example:
         id: string (identifier)
         status:
@@ -13625,6 +13847,8 @@ components:
               format: date-time
             lastModifiedBy:
               $ref: '#/components/schemas/microsoft.graph.identitySet'
+          #discriminator:
+#            propertyName: '@odata.type'
       example:
         id: string (identifier)
         allowedAudiences:
@@ -13876,6 +14100,7 @@ components:
           type: object
       example:
         id: string (identifier)
+      x-ms-discriminator-value: '#microsoft.graph.payloadResponse'
     microsoft.graph.meetingParticipantInfo:
       title: meetingParticipantInfo
       type: object
@@ -14002,6 +14227,7 @@ components:
           type: object
       example:
         id: string (identifier)
+      x-ms-discriminator-value: '#microsoft.graph.chatMessageHostedContent'
     microsoft.graph.teamsApp:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -14035,6 +14261,7 @@ components:
           '@odata.type': microsoft.graph.teamsAppDistributionMethod
         appDefinitions:
           - '@odata.type': microsoft.graph.teamsAppDefinition
+      x-ms-discriminator-value: '#microsoft.graph.teamsApp'
     microsoft.graph.teamsAppDefinition:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -14058,6 +14285,7 @@ components:
         teamsAppId: string
         displayName: string
         version: string
+      x-ms-discriminator-value: '#microsoft.graph.teamsAppDefinition'
     microsoft.graph.giphyRatingType:
       title: giphyRatingType
       enum:
@@ -14101,6 +14329,7 @@ components:
           '@odata.type': microsoft.graph.shiftItem
         userId: string
         schedulingGroupId: string
+      x-ms-discriminator-value: '#microsoft.graph.shift'
     microsoft.graph.openShift:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.changeTrackedEntity'
@@ -14125,6 +14354,7 @@ components:
         draftOpenShift:
           '@odata.type': microsoft.graph.openShiftItem
         schedulingGroupId: string
+      x-ms-discriminator-value: '#microsoft.graph.openShift'
     microsoft.graph.timeOff:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.changeTrackedEntity'
@@ -14149,6 +14379,7 @@ components:
         draftTimeOff:
           '@odata.type': microsoft.graph.timeOffItem
         userId: string
+      x-ms-discriminator-value: '#microsoft.graph.timeOff'
     microsoft.graph.timeOffReason:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.changeTrackedEntity'
@@ -14173,6 +14404,7 @@ components:
         iconType:
           '@odata.type': microsoft.graph.timeOffReasonIconType
         isActive: true
+      x-ms-discriminator-value: '#microsoft.graph.timeOffReason'
     microsoft.graph.schedulingGroup:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.changeTrackedEntity'
@@ -14200,6 +14432,7 @@ components:
         isActive: true
         userIds:
           - string
+      x-ms-discriminator-value: '#microsoft.graph.schedulingGroup'
     microsoft.graph.swapShiftsChangeRequest:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.offerShiftRequest'
@@ -14230,6 +14463,7 @@ components:
         senderShiftId: string
         recipientUserId: string
         recipientShiftId: string
+      x-ms-discriminator-value: '#microsoft.graph.swapShiftsChangeRequest'
     microsoft.graph.openShiftChangeRequest:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.scheduleChangeRequest'
@@ -14256,6 +14490,7 @@ components:
         senderUserId: string
         managerUserId: string
         openShiftId: string
+      x-ms-discriminator-value: '#microsoft.graph.openShiftChangeRequest'
     microsoft.graph.offerShiftRequest:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.scheduleChangeRequest'
@@ -14276,6 +14511,8 @@ components:
             recipientUserId:
               type: string
               nullable: true
+          # discriminator:
+          #   propertyName: '@odata.type'
       example:
         id: string (identifier)
         createdDateTime: string (timestamp)
@@ -14334,6 +14571,7 @@ components:
         startDateTime: string (timestamp)
         endDateTime: string (timestamp)
         timeOffReasonId: string
+      x-ms-discriminator-value: '#microsoft.graph.timeOffRequest'
     microsoft.graph.channelMembershipType:
       title: channelMembershipType
       enum:
@@ -14383,6 +14621,7 @@ components:
           '@odata.type': microsoft.graph.teamsTabConfiguration
         teamsApp:
           '@odata.type': microsoft.graph.teamsApp
+      x-ms-discriminator-value: '#microsoft.graph.teamsTab'
     microsoft.graph.teamsAppDistributionMethod:
       title: teamsAppDistributionMethod
       enum:
@@ -14630,6 +14869,7 @@ components:
           type: object
       example:
         id: string (identifier)
+      x-ms-discriminator-value: '#microsoft.graph.fieldValueSet'
     microsoft.graph.listItemVersion:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.baseItemVersion'
@@ -14647,6 +14887,7 @@ components:
           '@odata.type': microsoft.graph.publicationFacet
         fields:
           '@odata.type': microsoft.graph.fieldValueSet
+      x-ms-discriminator-value: '#microsoft.graph.listItemVersion'
     microsoft.graph.album:
       title: album
       type: object
@@ -14723,6 +14964,7 @@ components:
       example:
         id: string (identifier)
         calculationMode: string
+      x-ms-discriminator-value: '#microsoft.graph.workbookApplication'
     microsoft.graph.workbookNamedItem:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -14762,6 +15004,7 @@ components:
         visible: true
         worksheet:
           '@odata.type': microsoft.graph.workbookWorksheet
+      x-ms-discriminator-value: '#microsoft.graph.workbookNamedItem'
     microsoft.graph.workbookTable:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -14835,6 +15078,7 @@ components:
           '@odata.type': microsoft.graph.workbookTableSort
         worksheet:
           '@odata.type': microsoft.graph.workbookWorksheet
+      x-ms-discriminator-value: '#microsoft.graph.workbookTable'
     microsoft.graph.workbookWorksheet:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -14891,6 +15135,7 @@ components:
           '@odata.type': microsoft.graph.workbookWorksheetProtection
         tables:
           - '@odata.type': microsoft.graph.workbookTable
+      x-ms-discriminator-value: '#microsoft.graph.workbookWorksheet'
     microsoft.graph.workbookComment:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -14915,6 +15160,7 @@ components:
         contentType: string
         replies:
           - '@odata.type': microsoft.graph.workbookCommentReply
+      x-ms-discriminator-value: '#microsoft.graph.workbookComment'
     microsoft.graph.workbookFunctions:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -14922,6 +15168,7 @@ components:
           type: object
       example:
         id: string (identifier)
+      x-ms-discriminator-value: '#microsoft.graph.workbookFunctions'
     microsoft.graph.sharingInvitation:
       title: sharingInvitation
       type: object
@@ -15035,6 +15282,8 @@ components:
               nullable: true
             publication:
               $ref: '#/components/schemas/microsoft.graph.publicationFacet'
+          #discriminator:
+#            propertyName: '@odata.type'
       example:
         id: string (identifier)
         lastModifiedBy:
@@ -15107,6 +15356,7 @@ components:
           '@odata.type': microsoft.graph.identitySet
         driveItem:
           '@odata.type': microsoft.graph.driveItem
+      x-ms-discriminator-value: '#microsoft.graph.itemActivity'
     microsoft.graph.sitePageData:
       title: sitePageData
       type: object
@@ -15450,6 +15700,7 @@ components:
         notes: string
         activities:
           - '@odata.type': microsoft.graph.shiftActivity
+      x-ms-discriminator-value: '#microsoft.graph.shiftItem'
     microsoft.graph.openShiftItem:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.shiftItem'
@@ -15471,6 +15722,7 @@ components:
         activities:
           - '@odata.type': microsoft.graph.shiftActivity
         openSlotCount: integer
+      x-ms-discriminator-value: '#microsoft.graph.openShiftItem'
     microsoft.graph.timeOffItem:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.scheduleEntity'
@@ -15486,6 +15738,7 @@ components:
         theme:
           '@odata.type': microsoft.graph.scheduleEntityTheme
         timeOffReasonId: string
+      x-ms-discriminator-value: '#microsoft.graph.timeOffItem'
     microsoft.graph.timeOffReasonIconType:
       title: timeOffReasonIconType
       enum:
@@ -15544,6 +15797,8 @@ components:
             managerUserId:
               type: string
               nullable: true
+          #discriminator:
+#            propertyName: '@odata.type'
       example:
         id: string (identifier)
         createdDateTime: string (timestamp)
@@ -15613,6 +15868,7 @@ components:
           '@odata.type': microsoft.graph.Json
         filter:
           '@odata.type': microsoft.graph.workbookFilter
+      x-ms-discriminator-value: '#microsoft.graph.workbookTableColumn'
     microsoft.graph.workbookTableRow:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -15632,6 +15888,7 @@ components:
         index: integer
         values:
           '@odata.type': microsoft.graph.Json
+      x-ms-discriminator-value: '#microsoft.graph.workbookTableRow'
     microsoft.graph.workbookTableSort:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -15655,6 +15912,7 @@ components:
           - '@odata.type': microsoft.graph.workbookSortField
         matchCase: true
         method: string
+      x-ms-discriminator-value: '#microsoft.graph.workbookTableSort'
     microsoft.graph.workbookChart:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -15719,6 +15977,7 @@ components:
           '@odata.type': microsoft.graph.workbookChartTitle
         worksheet:
           '@odata.type': microsoft.graph.workbookWorksheet
+      x-ms-discriminator-value: '#microsoft.graph.workbookChart'
     microsoft.graph.workbookPivotTable:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -15736,6 +15995,7 @@ components:
         name: string
         worksheet:
           '@odata.type': microsoft.graph.workbookWorksheet
+      x-ms-discriminator-value: '#microsoft.graph.workbookPivotTable'
     microsoft.graph.workbookWorksheetProtection:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -15752,6 +16012,7 @@ components:
         options:
           '@odata.type': microsoft.graph.workbookWorksheetProtectionOptions
         protected: true
+      x-ms-discriminator-value: '#microsoft.graph.workbookWorksheetProtection'
     microsoft.graph.workbookCommentReply:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -15769,6 +16030,7 @@ components:
         id: string (identifier)
         content: string
         contentType: string
+      x-ms-discriminator-value: '#microsoft.graph.workbookCommentReply'
     microsoft.graph.accessAction:
       title: accessAction
       type: object
@@ -15855,6 +16117,7 @@ components:
         id: string (identifier)
         criteria:
           '@odata.type': microsoft.graph.workbookFilterCriteria
+      x-ms-discriminator-value: '#microsoft.graph.workbookFilter'
     microsoft.graph.workbookSortField:
       title: workbookSortField
       type: object
@@ -15908,6 +16171,7 @@ components:
           '@odata.type': microsoft.graph.workbookChartAxis
         valueAxis:
           '@odata.type': microsoft.graph.workbookChartAxis
+      x-ms-discriminator-value: '#microsoft.graph.workbookChartAxes'
     microsoft.graph.workbookChartDataLabels:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -15960,6 +16224,7 @@ components:
         showValue: true
         format:
           '@odata.type': microsoft.graph.workbookChartDataLabelFormat
+      x-ms-discriminator-value: '#microsoft.graph.workbookChartDataLabels'
     microsoft.graph.workbookChartAreaFormat:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -15976,6 +16241,7 @@ components:
           '@odata.type': microsoft.graph.workbookChartFill
         font:
           '@odata.type': microsoft.graph.workbookChartFont
+      x-ms-discriminator-value: '#microsoft.graph.workbookChartAreaFormat'
     microsoft.graph.workbookChartLegend:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -16002,6 +16268,7 @@ components:
         visible: true
         format:
           '@odata.type': microsoft.graph.workbookChartLegendFormat
+      x-ms-discriminator-value: '#microsoft.graph.workbookChartLegend'
     microsoft.graph.workbookChartSeries:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -16026,6 +16293,7 @@ components:
           '@odata.type': microsoft.graph.workbookChartSeriesFormat
         points:
           - '@odata.type': microsoft.graph.workbookChartPoint
+      x-ms-discriminator-value: '#microsoft.graph.workbookChartSeries'
     microsoft.graph.workbookChartTitle:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -16052,6 +16320,7 @@ components:
         visible: true
         format:
           '@odata.type': microsoft.graph.workbookChartTitleFormat
+      x-ms-discriminator-value: '#microsoft.graph.workbookChartTitle'
     microsoft.graph.workbookWorksheetProtectionOptions:
       title: workbookWorksheetProtectionOptions
       type: object
@@ -16208,6 +16477,7 @@ components:
           '@odata.type': microsoft.graph.workbookChartGridlines
         title:
           '@odata.type': microsoft.graph.workbookChartAxisTitle
+      x-ms-discriminator-value: '#microsoft.graph.workbookChartAxis'
     microsoft.graph.workbookChartDataLabelFormat:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -16224,6 +16494,7 @@ components:
           '@odata.type': microsoft.graph.workbookChartFill
         font:
           '@odata.type': microsoft.graph.workbookChartFont
+      x-ms-discriminator-value: '#microsoft.graph.workbookChartDataLabelFormat'
     microsoft.graph.workbookChartFill:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -16231,6 +16502,7 @@ components:
           type: object
       example:
         id: string (identifier)
+      x-ms-discriminator-value: '#microsoft.graph.workbookChartFill'
     microsoft.graph.workbookChartFont:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -16270,6 +16542,7 @@ components:
         name: string
         size: double
         underline: string
+      x-ms-discriminator-value: '#microsoft.graph.workbookChartFont'
     microsoft.graph.workbookChartLegendFormat:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -16286,6 +16559,7 @@ components:
           '@odata.type': microsoft.graph.workbookChartFill
         font:
           '@odata.type': microsoft.graph.workbookChartFont
+      x-ms-discriminator-value: '#microsoft.graph.workbookChartLegendFormat'
     microsoft.graph.workbookChartSeriesFormat:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -16302,6 +16576,7 @@ components:
           '@odata.type': microsoft.graph.workbookChartFill
         line:
           '@odata.type': microsoft.graph.workbookChartLineFormat
+      x-ms-discriminator-value: '#microsoft.graph.workbookChartSeriesFormat'
     microsoft.graph.workbookChartPoint:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -16318,6 +16593,7 @@ components:
           '@odata.type': microsoft.graph.Json
         format:
           '@odata.type': microsoft.graph.workbookChartPointFormat
+      x-ms-discriminator-value: '#microsoft.graph.workbookChartPoint'
     microsoft.graph.workbookChartTitleFormat:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -16334,6 +16610,7 @@ components:
           '@odata.type': microsoft.graph.workbookChartFill
         font:
           '@odata.type': microsoft.graph.workbookChartFont
+      x-ms-discriminator-value: '#microsoft.graph.workbookChartTitleFormat'
     microsoft.graph.workbookChartAxisFormat:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -16350,6 +16627,7 @@ components:
           '@odata.type': microsoft.graph.workbookChartFont
         line:
           '@odata.type': microsoft.graph.workbookChartLineFormat
+      x-ms-discriminator-value: '#microsoft.graph.workbookChartAxisFormat'
     microsoft.graph.workbookChartGridlines:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -16366,6 +16644,7 @@ components:
         visible: true
         format:
           '@odata.type': microsoft.graph.workbookChartGridlinesFormat
+      x-ms-discriminator-value: '#microsoft.graph.workbookChartGridlines'
     microsoft.graph.workbookChartAxisTitle:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -16387,6 +16666,7 @@ components:
         visible: true
         format:
           '@odata.type': microsoft.graph.workbookChartAxisTitleFormat
+      x-ms-discriminator-value: '#microsoft.graph.workbookChartAxisTitle'
     microsoft.graph.workbookChartLineFormat:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -16400,6 +16680,7 @@ components:
       example:
         id: string (identifier)
         color: string
+      x-ms-discriminator-value: '#microsoft.graph.workbookChartLineFormat'
     microsoft.graph.workbookChartPointFormat:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -16412,6 +16693,7 @@ components:
         id: string (identifier)
         fill:
           '@odata.type': microsoft.graph.workbookChartFill
+      x-ms-discriminator-value: '#microsoft.graph.workbookChartPointFormat'
     microsoft.graph.workbookChartGridlinesFormat:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -16424,6 +16706,7 @@ components:
         id: string (identifier)
         line:
           '@odata.type': microsoft.graph.workbookChartLineFormat
+      x-ms-discriminator-value: '#microsoft.graph.workbookChartGridlinesFormat'
     microsoft.graph.workbookChartAxisTitleFormat:
       allOf:
         - $ref: '#/components/schemas/microsoft.graph.entity'
@@ -16436,6 +16719,7 @@ components:
         id: string (identifier)
         font:
           '@odata.type': microsoft.graph.workbookChartFont
+      x-ms-discriminator-value: '#microsoft.graph.workbookChartAxisTitleFormat'
   responses:
     error:
       description: error

@@ -378,4 +378,21 @@ directive:
         }
         return $;
       }
+# Add custom -All parameter to _List cmdlets that support Odata next link.
+  - from: source-file-csharp
+    where: $
+    transform: >
+      if (!$documentPath.match(/generated%2Fcmdlets%2FGet\w*_List.cs/gm))
+      {
+        return $;
+      } else {
+        let odataNextLinkRegex = /(^\s*)(if\s*\(\s*result.OdataNextLink\s*!=\s*null\s*\))/gmi
+        if($.match(odataNextLinkRegex)) {
+          $ = $.replace(odataNextLinkRegex, '$1if (result.OdataNextLink != null && this.ShouldIteratePages(this.InvocationInformation.BoundParameters))\n$1');
+
+          let psBaseClassImplementationRegex = /(\s*:\s*)(global::System.Management.Automation.PSCmdlet)/gmi
+          $ = $.replace(psBaseClassImplementationRegex, '$1Microsoft.Graph.PowerShell.Cmdlets.Custom.ListCmdlet');
+        }
+        return $;
+      }
 ```
